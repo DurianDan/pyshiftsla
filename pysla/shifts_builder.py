@@ -36,9 +36,7 @@ class ShiftsBuilder(BaseModel):
         SOLAR_NEW_YEAR,
         INTERNATIONAL_LABOR_DAY,
     ]
-    special_shifts: Dict[date, None|Shifts] = {
-        date(2023, 18, 4): Shifts(shifts=[Shift(start=time(19,45), end=time(23,30))])
-    }
+    special_shifts: Dict[date, None|Shifts] = {}
 
     def generate_shifts(self) -> Shifts:
         pass

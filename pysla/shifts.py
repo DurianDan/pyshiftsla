@@ -1,5 +1,5 @@
 from typing import List
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, model_validator
 from datetime import time, datetime, timedelta
 
 Milliseconds = int
@@ -33,15 +33,15 @@ class Shift(BaseModel):
     start: datetime|time
     end: datetime|time
 
-    @root_validator()
-    def must_be_in_a_day(cls, vals):
-        check_start_end_event(vals['start'], vals['end'])
-        match isinstance(vals['start'], time), isinstance(vals['end'], time):
-            case True, True: return vals
+    @model_validator(mode='after')
+    def must_be_in_a_day(self) -> 'Shift':
+        check_start_end_event(self.start, self.end)
+        match isinstance(self.start, time), isinstance(self.end, time):
             case False, False:
-                assert check_events_same_day([vals['start'], vals['end']]), "'Start' and 'End' of a shift must be in a day"
-                return vals
+                assert check_events_same_day([self.start, self.end]), "'Start' and 'End' of a shift must be in a day"
+        return self
 
+    @property
     def diff(self) -> Milliseconds:
         if isinstance(self.start, time): return diff_time(self.start, self.end)
         return diff_datetime(self.start, self.end)
@@ -76,7 +76,7 @@ class Shift(BaseModel):
             case False, True: return diff_datetime(self.start, end_work)
             case False, False: 
                 if start_work < self.start and end_work > self.end:
-                    return self.diff()
+                    return self.diff
                 else:
                     raise diff_datetime(start_work, end_work)
 
@@ -84,7 +84,7 @@ class Shifts(BaseModel):
     shifts: List[Shift]
 
     def total_milliseconds(self) -> Milliseconds:
-        return sum([shift.diff() for shift in self.shifts])
+        return sum([shift.diff for shift in self.shifts])
 
     def work_amount_in_shifts(
         self,

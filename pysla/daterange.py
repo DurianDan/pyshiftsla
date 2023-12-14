@@ -8,7 +8,7 @@ YEAR = MONTH = DAY = int
 
 class DateRangeConfig(BaseModel):
     start: date
-    end: Optional[date]
+    end: Optional[date] = None
     calendar_type: Literal['lunar', 'solar'] = 'solar'
 
 class DateRange(DateRangeConfig):
