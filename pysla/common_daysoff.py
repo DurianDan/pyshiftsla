@@ -1,6 +1,6 @@
 from datetime import date, time
 from .daterange import DateRange
-from .shifts import Shift, Shifts
+from .shifts import Shift, DailyShift
 
 VIETNAM_VICTORY_DAY = DateRange(start=date(2024, 4, 30))
 SOLAR_NEW_YEAR = DateRange(start=date(2024, 1, 1))
@@ -18,7 +18,7 @@ LUNAR_NEW_YEAR = DateRange(
     calendar_type='lunar'
     )
 COMMON_WEEKDAYS = [0,1,2,3,4]
-COMMON_DAILY_SHIFTS = Shifts(shifts=[
+COMMON_DAILY_SHIFTS = DailyShift([
         Shift(start=time(8,30), end=time(11,45)),
         Shift(start=time(13,15), end=time(17,45)),
     ])

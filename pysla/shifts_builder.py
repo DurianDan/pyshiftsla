@@ -2,7 +2,7 @@ from typing import Dict, List
 from pydantic import BaseModel
 from datetime import date, time
 from .daterange import DateRange
-from .shifts import Shift, Shifts
+from .shifts import Shift, DailyShift
 from .common_daysoff import (
     VIETNAM_VICTORY_DAY,
     SOLAR_NEW_YEAR,
@@ -26,7 +26,7 @@ class ShiftsBuilder(BaseModel):
     :param special_shifts: special `Shifts` of a *specific date*, if `None`, that day will have zero shifts.
     '''
     workdays_weekly: List[int] = COMMON_WEEKDAYS
-    shifts_daily: Shifts = COMMON_DAILY_SHIFTS
+    shifts_daily: DailyShift = COMMON_DAILY_SHIFTS
     days_off: List[DateRange] = [
         VIETNAM_VICTORY_DAY,
         VIETNAM_INDEPENDENT_DAY,
@@ -36,7 +36,7 @@ class ShiftsBuilder(BaseModel):
         SOLAR_NEW_YEAR,
         INTERNATIONAL_LABOR_DAY,
     ]
-    special_shifts: Dict[date, None|Shifts] = {}
+    special_shifts: Dict[date, None|DailyShift] = {}
 
-    def generate_shifts(self) -> Shifts:
+    def generate_shifts(self) -> DailyShift:
         pass

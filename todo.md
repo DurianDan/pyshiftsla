@@ -1,0 +1,6 @@
+- `Shift`;
+    - Refactor the compare method to be Single-res
+    - finish method resolve()
+- `DailyShift`:
+    - add resolve() method for overlapping `Shift`
+    - add validation for `Shift`s to be under **24hours**.
