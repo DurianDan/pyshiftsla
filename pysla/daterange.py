@@ -1,32 +1,37 @@
-from typing import List, Literal, Optional
+from typing import Dict, List, Literal, Optional, Iterable
 import pandas as pd
 from pydantic import BaseModel
 from datetime import date
 from lunardate import LunarDate
 
-class DateRange(BaseModel):
+YEAR = MONTH = DAY = int
+
+class DateRangeConfig(BaseModel):
     start: date
     end: Optional[date]
     calendar_type: Literal['lunar', 'solar'] = 'solar'
 
-    def get_solar_daterange(self) -> 'DateRange':
+class DateRange(DateRangeConfig):
+    @property
+    def solar_daterange(self) -> 'DateRange':
         '''
-        Get solar `DateRange`, whatever the calendar is.
+        Get solar `DateRange`, whatever the `calendar_type` is.
         '''
         if self.calendar_type == 'solar': return self
         else: return self.lunar_to_solar_daterange()
     
-    def to_dates(self) -> List[date]:
+    @property
+    def dates(self) -> List[date]:
         '''
         Return a list of dates, inside the date range, including the start and end date.
         '''
-        daterange = self.get_solar_daterange()
+        daterange = self.solar_daterange()
         if not self.end: return [daterange.start]
         datetime_in_range = pd.date_range(
             start=daterange.start,
             end=daterange.end,
             freq="d").to_pydatetime().tolist()
-        dates_in_range = [dt.date() for dt in datetime_in_range]
+        dates_in_range: List[date] = [dt.date() for dt in datetime_in_range]
         return dates_in_range
 
     def lunar_to_solar_daterange(self) -> 'DateRange':
@@ -40,3 +45,16 @@ class DateRange(BaseModel):
             solar_date_end = LunarDate(
                 self.end.year, self.end.month, self.end.day).toSolarDate()
         return DateRange(start=solar_date_start, end=solar_date_end)
+
+    def from_dates(
+        self,
+        dates: List[date],
+        sorted_ascending: bool = True
+    ) -> List['DateRange']:
+        sorted_dates = sorted()
+
+    def substract(self, other_range: 'DateRange') -> List['DateRange']:
+        pass
+
+if __name__=="__main__":
+    pass

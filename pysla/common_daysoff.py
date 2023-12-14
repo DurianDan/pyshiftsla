@@ -1,6 +1,6 @@
 from datetime import date, time
-from daterange import DateRange
-from shifts import Shift, Shifts
+from .daterange import DateRange
+from .shifts import Shift, Shifts
 
 VIETNAM_VICTORY_DAY = DateRange(start=date(2024, 4, 30))
 SOLAR_NEW_YEAR = DateRange(start=date(2024, 1, 1))
