@@ -59,7 +59,9 @@ class ShiftsBuilder(BaseModel):
             else self.workdays_weekly,
             shifts_daily=shifts_daily if shifts_daily else self.shifts_daily,
             days_off=days_off if days_off else self.days_off,
-            special_shifts=special_shifts if special_shifts else self.special_shifts,
+            special_shifts=special_shifts
+            if special_shifts
+            else self.special_shifts,
         )
 
     def add_days_off(
@@ -76,7 +78,9 @@ class ShiftsBuilder(BaseModel):
         if inplace:
             self.workdays_weekly.add(workday)
             return
-        return self.partial_copy(workdays_weekly=self.workdays_weekly.union({workday}))
+        return self.partial_copy(
+            workdays_weekly=self.workdays_weekly.union({workday})
+        )
 
     def update_workdays_weekly(
         self, workdays: WEEKDAYS, inplace: bool = False

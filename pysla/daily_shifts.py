@@ -20,7 +20,9 @@ class DailyShift(RootModel):
 
     def __getitem__(self, idx: int) -> Shift | None:
         if not isinstance(idx, int):
-            raise NotImplementedError(f"Only accept index as `int` not {type(idx)}")
+            raise NotImplementedError(
+                f"Only accept index as `int` not {type(idx)}"
+            )
         return self.root[idx]
 
     def resolve_overlap(self):

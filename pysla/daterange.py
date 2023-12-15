@@ -52,10 +52,10 @@ class DateRange(DateRangeConfig):
             ).toSolarDate()
         return DateRange(start=solar_date_start, end=solar_date_end)
 
-    def from_dates(
-        self, dates: List[date], sorted_ascending: bool = True
-    ) -> List["DateRange"]:
-        sorted_dates = sorted()
+    # def from_dates(
+    #     self, dates: List[date], sorted_ascending: bool = True
+    # ) -> List["DateRange"]:
+    #     sorted_dates = sorted()
 
     def substract(self, other_range: "DateRange") -> List["DateRange"]:
         pass

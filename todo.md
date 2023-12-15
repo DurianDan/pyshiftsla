@@ -1,4 +1,4 @@
-- `Shift`;
+- [X] `Shift`;
     - Refactor the compare method to be Single-res
     - finish method resolve()
 - `DailyShift`:

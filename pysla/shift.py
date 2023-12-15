@@ -8,12 +8,14 @@ from .datetime_utilities import (
     Milliseconds,
 )
 
-COMPARE_TO_ANOTHER_SHIFT_MISMATCH_STARTEND = Literal[  # comparing -___- to |___|
-    "smaller",  # -___-  |___|
-    "greater",  # |___|  -___-
-    "end-connects-start",  # -___+___|
-    "start-connects-end",  # |___+___-
-]
+COMPARE_TO_ANOTHER_SHIFT_MISMATCH_STARTEND = (
+    Literal[  # comparing -___- to |___|
+        "smaller",  # -___-  |___|
+        "greater",  # |___|  -___-
+        "end-connects-start",  # -___+___|
+        "start-connects-end",  # |___+___-
+    ]
+)
 COMPARE_TO_ANOTHER_SHIFT_MATCH_STARTEND = Literal[  # comparing -___- to |___|
     "equal",  # +___+
     "following",  # -_|__-_|
@@ -22,15 +24,23 @@ COMPARE_TO_ANOTHER_SHIFT_MATCH_STARTEND = Literal[  # comparing -___- to |___|
     "be-contained",  # |__-__-__|
 ]
 COMPARE_TO_ANOTHER_SHIFT = Union[
-    COMPARE_TO_ANOTHER_SHIFT_MISMATCH_STARTEND, COMPARE_TO_ANOTHER_SHIFT_MATCH_STARTEND
+    COMPARE_TO_ANOTHER_SHIFT_MISMATCH_STARTEND,
+    COMPARE_TO_ANOTHER_SHIFT_MATCH_STARTEND,
 ]
-RESOLVE_TWO_SHIFTS_STRATEGY = Literal["inner", "outer", "both"]
 
 
-class RESOLVED_TWO_SHIFTS(TypedDict):
-    inner: Optional["Shift"]
-    outer: Optional[List["Shift"]]
+class RESOLVED_OVERLAPPED_SHIFT(TypedDict):
+    overlapped: Optional["Shift"]
     compare_result: COMPARE_TO_ANOTHER_SHIFT
+
+
+RESOLVED_OUTER_SHIFTS = Optional[
+    List["Shift"]
+]  # `None` if 2 `Shift`s are equal
+
+
+class RESOLVED_TWO_SHIFTS(RESOLVED_OVERLAPPED_SHIFT):
+    outer: RESOLVED_OUTER_SHIFTS
 
 
 class Shift(BaseModel):
@@ -49,7 +59,9 @@ class Shift(BaseModel):
     def is_in_shift(self, event: time) -> bool:
         return event >= self.start and event <= self.end
 
-    def work_amount_in_shift(self, start_work: time, end_work: time) -> Milliseconds:
+    def work_amount_in_shift(
+        self, start_work: time, end_work: time
+    ) -> Milliseconds:
         """
         Calculate how much a work takes up a shift. return the milliseconds(int) that work takes
 
@@ -67,20 +79,6 @@ class Shift(BaseModel):
                 return diff_time(self.start, end_work)
             case False, False:
                 return self.diff
-
-    def resolve(
-        self, other: "Shift", strategy: RESOLVE_TWO_SHIFTS_STRATEGY = "inner"
-    ) -> RESOLVED_TWO_SHIFTS:
-        """Resolve another overlapped `Shift`s, getting their inner/outer joined Shifts, and the compare result.
-            return a `RESOLVED_TWO_SHIFTS`
-
-        :param other: the other `Shift` to resolve
-        :param strategy: 'inner' is for getting the overlapped `Shift` inside both of them.
-        'outer' is for getting the `Shift`s that are not overlapped. default is 'inner'
-        """
-        overlapped_shift = self & other
-        if strategy == "inner":
-            return overlapped_shift
 
     def _compare_mismatch_startend(
         self, other: "Shift"
@@ -101,19 +99,17 @@ class Shift(BaseModel):
             compare_times(self.start, other.start),
             compare_times(self.end, other.end),
         ):
-            case "equal", "equal":
+            case "equal", "equal":  # equal
                 return "equal"
-            case "smaller", "smaller":
+            case "smaller", "smaller":  # following
                 return "following"
-            case "greater", "greater":
+            case "greater", "greater":  # leading
                 return "leading"
-
-            case "equal", "greater":
+            case "equal", "greater":  # contain
                 return "contain"
             case "smaller", "equal" | "greater":
                 return "contain"
-
-            case "equal", "smaller":
+            case "equal", "smaller":  # be-contained
                 return "be-contained"
             case "greater", "smaller" | "equal":
                 return "be-contained"
@@ -124,44 +120,75 @@ class Shift(BaseModel):
             return compare_mismatch_startend
         return self._compare_match_startend(other)
 
-    def resolve(
-        self, other: "Shift", strategy: Literal["inner", "outer", "both"]
-    ) -> Tuple[COMPARE_TO_ANOTHER_SHIFT, Optional["Shift"]]:
-        """Check if 2 shifts are overlap, and overlap how much with each other.
-        return another `Shift` if overlapped, and `None` if not overlap
-        """
-        overlap_shift = Shift(start=self.start, end=self.end)
+    def get_overlap(self, other: "Shift") -> RESOLVED_OVERLAPPED_SHIFT:
+        """Get overlapped `Shift`. if not overlap => return None."""
+        overlapped_shift = Shift(  # equal to self `Shift`
+            start=self.start, end=self.end
+        )
         compare_result = self.compare(other)
         match compare_result:
             case "smaller" | "greater" | "start-connects-end" | "end-connects-start":
-                overlap_shift = None
+                overlapped_shift = None
             case "following":
-                overlap_shift.start = other.start
+                overlapped_shift.start = other.start
             case "leading":
-                overlap_shift.end = other.end
-            case "contain" | "equal":
-                overlap_shift = other
-            case "be-contained":
+                overlapped_shift.end = other.end
+            case "contain":
+                overlapped_shift = other
+            case "be-contained" | "equal":
                 None
-        return [compare_result, overlap_shift]
+        return {
+            "overlapped": overlapped_shift,
+            "compare_result": compare_result,
+        }
 
-    def get_outer(self, other: "Shift") -> List["Shift"]:
+    def get_outer(
+        self,
+        other: "Shift",
+        resovled_overlap: RESOLVED_OVERLAPPED_SHIFT | None = None,
+    ) -> RESOLVED_OUTER_SHIFTS:
         """Get the outer `Shift`s of 2 overlapped `Shift`s, return both of them, if not overlapped"""
-        compare_result, overlap_shift = self.get_overlap(other)
+        if not resovled_overlap:
+            resovled_overlap = self.get_overlap(other)
         outer_shifts = [self]
-        match compare_result:
-            case "start-connects-end" | "end-connects-start":
-                return [
+        match resovled_overlap["compare_result"]:
+            case "smaller" | "greater":
+                outer_shifts.append(other)
+            case "end-connects-start" | "start-connects-end":
+                outer_shifts = [
                     Shift(
-                        start=min(self.start, other.start), end=max(self.end, other.end)
+                        start=min(self.start, other.start),
+                        start=max(self.start, other.end),
                     )
                 ]
-            case "following":
-                overlap_shift.start = other.start
-            case "leading":
-                overlap_shift.end = other.end
-            case "contain" | "equal":
-                overlap_shift = other
+            case "equal":
+                outer_shifts = None
+            case "following" | "leading" | "contain" | "be-contained":
+                outer_shifts = [
+                    Shift(
+                        start=min(self.start, other.start),
+                        end=resovled_overlap["overlapped"].start,
+                    ),
+                    Shift(
+                        start=resovled_overlap["overlapped"].end,
+                        end=max(self.end, other.end),
+                    ),
+                ]
+
+    def resolve(self, other: "Shift") -> RESOLVED_TWO_SHIFTS:
+        """Check if 2 shifts are overlap, and overlap how much with each other.
+        :param other: the other `Shift` to compare to
+        :param strategy: default is 'inner' means getting the overlapped `Shift`, or None if no overllaped.
+            'outer' is for getting the outer join of the 2 Shifts, return a list of outer `Shift`s (overlapped Shift not included)
+            'both' will return both 'outer' and 'inner' resolving results.
+        :rtype:  `RESOLVED_TWO_SHIFTS`
+        """
+        resolved_overlap = self.get_overlap(other)
+        resolved = {
+            **resolved_overlap,
+            "outer": self.get_outer(other, resolved_overlap),
+        }
+        return resolved
 
     def __ne__(self, other: "Shift") -> bool:
         """different than. No overlap at all"""
