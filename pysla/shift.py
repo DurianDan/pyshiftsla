@@ -1,5 +1,6 @@
 from typing import List, Optional, Literal, Union, Tuple, TypedDict
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, model_validator, AfterValidator
+from typing_extensions import Annotated
 from datetime import time
 from .datetime_utilities import (
     diff_time,
@@ -43,13 +44,17 @@ class RESOLVED_TWO_SHIFTS(RESOLVED_OVERLAPPED_SHIFT):
     outer: RESOLVED_OUTER_SHIFTS
 
 
-def check_shift_str(shiftstr: str) -> Tuple[time, time] | None:
+def check_shift_str(shiftstr: str) -> str:
     assert (
         len(shiftstr) == 8
     ), f"Shift string must have length 8, not {len(shiftstr)}, {shiftstr = }"
     assert (
         shiftstr.isnumeric()
     ), f"Shift string must contains only numbers: {shiftstr = }"
+    return shiftstr
+
+
+def convert_shift_str(shiftstr: str) -> Tuple[time, time] | None:
     nums = [int(shiftstr[i : i + 2]) for i in range(0, 8, 2)]
     try:
         first_time = time(nums[0], nums[1])
@@ -57,6 +62,9 @@ def check_shift_str(shiftstr: str) -> Tuple[time, time] | None:
         return [first_time, second_time]
     except Exception as err:
         raise Exception(f"Invalid `shiftstr` {shiftstr}") from err
+
+
+SHIFT_STRING = Annotated[str, AfterValidator(check_shift_str)]
 
 
 class Shift(BaseModel):
@@ -69,11 +77,11 @@ class Shift(BaseModel):
         return self
 
     @classmethod
-    def fromstr(cls, shiftstr: str) -> "Shift":
+    def fromstr(cls, shiftstr: SHIFT_STRING) -> "Shift":
         """Turn a string into a Shift.
         E.g.: "01120932" => Shift(start=time(1,12), end=time(9,32))
         """
-        checked_shiftstr = check_shift_str(shiftstr)
+        checked_shiftstr = convert_shift_str(shiftstr)
         return Shift(start=checked_shiftstr[0], end=checked_shiftstr[1])
 
     @property
