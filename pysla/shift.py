@@ -148,7 +148,7 @@ class Shift(BaseModel):
         resovled_overlap: RESOLVED_OVERLAPPED_SHIFT | None = None,
     ) -> RESOLVED_OUTER_SHIFTS:
         """Get the outer `Shift`s of 2 overlapped `Shift`s, return both of them, if not overlapped"""
-        if not resovled_overlap:
+        if resovled_overlap is None:
             resovled_overlap = self.get_overlap(other)
         outer_shifts = [self]
         match resovled_overlap["compare_result"]:
@@ -157,8 +157,8 @@ class Shift(BaseModel):
             case "end-connects-start" | "start-connects-end":
                 outer_shifts = [
                     Shift(
-                        start=min(self.start, other.start),
-                        start=max(self.start, other.end),
+                        start=min([self.start, other.start]),
+                        end=max([self.start, other.end]),
                     )
                 ]
             case "equal":
@@ -166,14 +166,15 @@ class Shift(BaseModel):
             case "following" | "leading" | "contain" | "be-contained":
                 outer_shifts = [
                     Shift(
-                        start=min(self.start, other.start),
+                        start=min([self.start, other.start]),
                         end=resovled_overlap["overlapped"].start,
                     ),
                     Shift(
                         start=resovled_overlap["overlapped"].end,
-                        end=max(self.end, other.end),
+                        end=max([self.end, other.end]),
                     ),
                 ]
+        return outer_shifts
 
     def resolve(self, other: "Shift") -> RESOLVED_TWO_SHIFTS:
         """Check if 2 shifts are overlap, and overlap how much with each other.

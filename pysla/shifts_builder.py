@@ -1,10 +1,8 @@
 from typing import Dict, List, Optional, Set
-from typing_extensions import Annotated
-from pydantic import BaseModel, AfterValidator
+from pydantic import BaseModel
 from datetime import date
 from .daterange import DateRange
 from .daily_shifts import DailyShift
-from .datetime_utilities import check_valid_weekday
 from .common_daysoff import (
     VIETNAM_VICTORY_DAY,
     SOLAR_NEW_YEAR,
@@ -14,12 +12,12 @@ from .common_daysoff import (
     LUNAR_NEW_YEAR,
     COMMON_WORKDAYS_IN_WEEK,
     COMMON_DAILY_SHIFTS,
+    WEEKDAY,
+    WEEKDAYS,
 )
 
 YEAR = MONTH = DAY = int
 SPECIFIED_SHIFTS = Dict[date, DailyShift]
-WEEKDAY = Annotated[int, AfterValidator(check_valid_weekday)]
-WEEKDAYS = Set[WEEKDAY]
 
 
 class ShiftsBuilder(BaseModel):

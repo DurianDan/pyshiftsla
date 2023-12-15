@@ -1,7 +1,14 @@
 from datetime import date, time
 from .daterange import DateRange
-from .shifts_builder import WEEKDAYS
-from .shift import Shift, DailyShift
+from .daily_shifts import Shift, DailyShift
+from .datetime_utilities import check_valid_weekday
+from pydantic import AfterValidator
+from typing_extensions import Annotated
+from typing import Set
+
+
+WEEKDAY = Annotated[int, AfterValidator(check_valid_weekday)]
+WEEKDAYS = Set[WEEKDAY]
 
 VIETNAM_VICTORY_DAY = DateRange(start=date(2024, 4, 30))
 SOLAR_NEW_YEAR = DateRange(start=date(2024, 1, 1))
