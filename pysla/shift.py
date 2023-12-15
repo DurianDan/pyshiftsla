@@ -43,6 +43,22 @@ class RESOLVED_TWO_SHIFTS(RESOLVED_OVERLAPPED_SHIFT):
     outer: RESOLVED_OUTER_SHIFTS
 
 
+def check_shift_str(shiftstr: str) -> Tuple[time, time] | None:
+    assert (
+        len(shiftstr) == 8
+    ), f"Shift string must have length 8, not {len(shiftstr)}, {shiftstr = }"
+    assert (
+        shiftstr.isnumeric()
+    ), f"Shift string must contains only numbers: {shiftstr = }"
+    nums = [int(shiftstr[i : i + 2]) for i in range(0, 8, 2)]
+    try:
+        first_time = time(nums[0], nums[1])
+        second_time = time(nums[2], nums[3])
+        return [first_time, second_time]
+    except Exception as err:
+        raise Exception(f"Invalid `shiftstr` {shiftstr} \n {err}")
+
+
 class Shift(BaseModel):
     start: time
     end: time
@@ -51,6 +67,14 @@ class Shift(BaseModel):
     def start_must_happend_before_end(self) -> "Shift":
         check_start_end_event(self.start, self.end)
         return self
+
+    @classmethod
+    def fromstr(self, shiftstr: str) -> "Shift":
+        """Turn a string into a Shift.
+        E.g.: "01120932" => Shift(start=time(1,12), end=time(9,32))
+        """
+        checked_shiftstr = check_shift_str(shiftstr)
+        return Shift(start=checked_shiftstr[0], end=checked_shiftstr[1])
 
     @property
     def diff(self) -> Milliseconds:
