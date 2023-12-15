@@ -32,7 +32,7 @@ def test_shift_from_str():
     result_shift = Shift(start=time(10, 10), end=time(11, 10))
     assert (
         shift_from_str == result_shift
-    ), f"Wrong conversion from shift string '{shiftstr}' into {shift_from_str}"
+    ), f"Wrong conversion from shift string '{shiftstr}' into '{shift_from_str}'"
 
 
 def test_compare_two_shifts():

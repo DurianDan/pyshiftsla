@@ -34,7 +34,7 @@ def check_start_end_event(start: datetime | time, end: datetime | time) -> None:
 
 def check_events_same_day(events: List[datetime]) -> bool:
     first_event_date = events[0].date()
-    return all([event.date() == first_event_date for event in events[1:]])
+    return all(event.date() == first_event_date for event in events[1:])
 
 
 def compare_times(

@@ -56,7 +56,7 @@ def check_shift_str(shiftstr: str) -> Tuple[time, time] | None:
         second_time = time(nums[2], nums[3])
         return [first_time, second_time]
     except Exception as err:
-        raise Exception(f"Invalid `shiftstr` {shiftstr} \n {err}")
+        raise Exception(f"Invalid `shiftstr` {shiftstr}") from err
 
 
 class Shift(BaseModel):
@@ -69,7 +69,7 @@ class Shift(BaseModel):
         return self
 
     @classmethod
-    def fromstr(self, shiftstr: str) -> "Shift":
+    def fromstr(cls, shiftstr: str) -> "Shift":
         """Turn a string into a Shift.
         E.g.: "01120932" => Shift(start=time(1,12), end=time(9,32))
         """
@@ -87,7 +87,8 @@ class Shift(BaseModel):
         self, start_work: time, end_work: time
     ) -> Milliseconds:
         """
-        Calculate how much a work takes up a shift. return the milliseconds(int) that work takes
+        Calculate how much a work takes up a shift.
+        return the milliseconds(int) that work takes
 
         :param start_work: Starts Work Event
         :param end_work: Ends Work Event
@@ -159,8 +160,6 @@ class Shift(BaseModel):
                 overlapped_shift.end = other.end
             case "contain":
                 overlapped_shift = other
-            case "be-contained" | "equal":
-                None
         return {
             "overlapped": overlapped_shift,
             "compare_result": compare_result,
@@ -171,7 +170,9 @@ class Shift(BaseModel):
         other: "Shift",
         resovled_overlap: RESOLVED_OVERLAPPED_SHIFT | None = None,
     ) -> RESOLVED_OUTER_SHIFTS:
-        """Get the outer `Shift`s of 2 overlapped `Shift`s, return both of them, if not overlapped"""
+        """Get the outer `Shift`s of 2 overlapped `Shift`s,
+        return both of them, if not overlapped
+        """
         if resovled_overlap is None:
             resovled_overlap = self.get_overlap(other)
         outer_shifts = [self]
@@ -203,8 +204,10 @@ class Shift(BaseModel):
     def resolve(self, other: "Shift") -> RESOLVED_TWO_SHIFTS:
         """Check if 2 shifts are overlap, and overlap how much with each other.
         :param other: the other `Shift` to compare to
-        :param strategy: default is 'inner' means getting the overlapped `Shift`, or None if no overllaped.
-            'outer' is for getting the outer join of the 2 Shifts, return a list of outer `Shift`s (overlapped Shift not included)
+        :param strategy: default is 'inner' means getting the overlapped `Shift`,
+            or None if no overllaped.
+            'outer' is for getting the outer join of the 2 Shifts,
+            return a list of outer `Shift`s (overlapped Shift not included)';
             'both' will return both 'outer' and 'inner' resolving results.
         :rtype:  `RESOLVED_TWO_SHIFTS`
         """

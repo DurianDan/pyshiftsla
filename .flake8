@@ -1,5 +1,10 @@
 [flake8]
-ignore = E203, E266, E501, W503, F403, F401
+ignore = E203, E266, E501, W503, F403, F401, B950, B907
 max-line-length = 80
-max-complexity = 18
+max-complexity = 10
 select = B,C,E,F,W,T4,B9
+show-source = true
+statistics = true
+
+extend-ignore = E741
+plugins = flake8-bugbear, flake8-comprehensions, flake8-docstrings, flake8-import-order
