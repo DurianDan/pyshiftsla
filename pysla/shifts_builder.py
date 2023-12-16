@@ -46,7 +46,7 @@ class ShiftsBuilder(BaseModel):
 
     def partial_copy(
         self,
-        workdays_weekly: List[int] | None = None,
+        workdays_weekly: WEEKDAYS | None = None,
         shifts_daily: DailyShift | None = None,
         days_off: List[DateRange] | None = None,
         special_shifts: SPECIFIED_SHIFTS | None = None,
@@ -80,31 +80,30 @@ class ShiftsBuilder(BaseModel):
             workdays_weekly=self.workdays_weekly.union({workday})
         )
 
-    def update_workdays_weekly(
-        self, workdays: WEEKDAYS, inplace: bool = False
+    def update(
+        self,
+        workdays_weekly: WEEKDAYS | None = None,
+        shifts_daily: DailyShift | None = None,
+        days_off: List[DateRange] | None = None,
+        special_shifts: SPECIFIED_SHIFTS | None = None,
+        inplace=True,
     ) -> Optional["ShiftsBuilder"]:
         if inplace:
-            self.workdays_weekly = workdays
+            if workdays_weekly is not None:
+                self.workdays_weekly = workdays_weekly
+            if shifts_daily is not None:
+                self.shifts_daily = shifts_daily
+            if days_off is not None:
+                self.days_off = days_off
+            if special_shifts is not None:
+                self.special_shifts = special_shifts
             return
-        return self.partial_copy(workdays_weekly=workdays)
+        return self.partial_copy(
+            workdays_weekly=workdays_weekly,
+            shifts_daily=shifts_daily,
+            days_off=days_off,
+            special_shifts=special_shifts,
+        )
 
-    def update_days_off(
-        self, days_off: List[DateRange], inplace: bool = False
-    ) -> Optional["ShiftsBuilder"]:
-        if inplace:
-            self.days_off = days_off
-            return
-        return self.partial_copy(days_off=days_off)
-
-    def update_special_shifts(
-        self, custom_shifts: SPECIFIED_SHIFTS, inplace: bool = False
-    ) -> Optional["ShiftsBuilder"]:
-        if inplace:
-            self.special_shifts.update(custom_shifts)
-            return
-        new_shifts = self.special_shifts.copy()
-        new_shifts.update(custom_shifts)
-        return self.partial_copy(special_shifts=new_shifts)
-
-    def generate_shifts(self) -> DailyShift:
+    def generate_shifts(self) -> Dict[date, DailyShift]:
         pass

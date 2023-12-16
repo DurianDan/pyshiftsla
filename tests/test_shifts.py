@@ -1,10 +1,5 @@
-import pytest
-
 from pysla.shift import Shift
 from pysla.common_daysoff import COMMON_DAILY_SHIFTS
-from pysla.shift import COMPARE_TO_ANOTHER_SHIFT
-
-from typing import Tuple, List
 from datetime import time
 
 from .test_objects import LEFT_SHIFT, RIGHT_SHIFTS_TO_COMPARE

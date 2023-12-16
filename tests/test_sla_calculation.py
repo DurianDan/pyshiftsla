@@ -1,4 +1,3 @@
-import pytest
 from pysla.shifts_builder import ShiftsBuilder, DailyShift
 
 

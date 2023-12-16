@@ -13,6 +13,19 @@ SORTED_SHIFTS_START = Annotated[
 ]
 
 
+def check_shifts_in_day(shifts_to_check: List[Shift]) -> List[Shift]:
+    """Check if all parsed shifts have the total amount of time to be smaller than 24hours"""
+    sum_milli = sum([shift.diff for shift in shifts_to_check])
+    milli_in_a_day = 86_400_000
+    assert (
+        sum_milli <= milli_in_a_day
+    ), f"A day has 86_400_000 milliseconds, The parsed shifts must have total sum milliseconds smaller than a day: {sum_milli}"
+    return shifts_to_check
+
+
+SHIFTS_IN_DAY = Annotated[List[Shift], AfterValidator(check_shifts_in_day)]
+
+
 class DailyShift(RootModel):
     """
     Shifts in a day, represented by a list of `Shift` objects,
@@ -21,7 +34,7 @@ class DailyShift(RootModel):
      (1day = 24hours = 24*60*60*1000Milliseconds)
     """
 
-    root: List[Shift]
+    root: SHIFTS_IN_DAY
 
     def __iter__(self) -> List[Shift]:
         return self.root
@@ -85,7 +98,9 @@ class DailyShift(RootModel):
         match method:
             case "outer":
                 sorted_resolving_shifts.append(tmp_resolve[method][0])
-                sorted_original_shifts[tmp_shift_idx + 1] = tmp_resolve[method][1]
+                sorted_original_shifts[tmp_shift_idx + 1] = tmp_resolve[method][
+                    1
+                ]
             case "overlapped":
                 sorted_resolving_shifts.append(tmp_resolve[method])
                 sorted_resolving_shifts[tmp_shift_idx + 1] = tmp_resolve[method]

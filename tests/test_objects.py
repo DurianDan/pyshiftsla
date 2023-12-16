@@ -1,5 +1,4 @@
 from pysla.shift import Shift, SHIFT_STRING, COMPARE_TO_ANOTHER_SHIFT
-from pysla.common_daysoff import COMMON_DAILY_SHIFTS
 from typing import Tuple, List
 
 left_shift_str = "10101110"

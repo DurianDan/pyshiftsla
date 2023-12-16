@@ -1,17 +1,42 @@
-from typing import Dict, List, Literal, Optional, Iterable
+from typing import List, Literal, Optional, Tuple
 import pandas as pd
 from pydantic import BaseModel
-from datetime import date
+from datetime import date, datetime
 from lunardate import LunarDate
+
+CALENDAR_TYPE = Literal["lunar", "solar"]
 
 
 class DateRangeConfig(BaseModel):
     start: date
     end: Optional[date] = None
-    calendar_type: Literal["lunar", "solar"] = "solar"
+    calendar_type: CALENDAR_TYPE = "solar"
 
 
 class DateRange(DateRangeConfig):
+    @staticmethod
+    def fromstr(
+        daterange_str: str,
+        calendar_type: CALENDAR_TYPE = "solar",
+        date_format: str = "%Y%m%d",
+    ) -> "DateRange":
+        dates_component = daterange_str.strip().split("-")
+        invalid_daterange_str = f"Date range must be in the format '{date_format}-{date_format}' or '{date_format}', invalid: {daterange_str}"
+        assert len(dates_component) in [1, 2], invalid_daterange_str
+        end_date = None
+        try:
+            if len(dates_component) == 2 and dates_component[1] != "":
+                end_date = datetime.strptime(
+                    dates_component[0], date_format
+                ).date()
+            return DateRange(
+                start=datetime.strptime(dates_component[0], date_format).date(),
+                end=end_date,
+                calendar_type=calendar_type,
+            )
+        except Exception as err:
+            raise ValueError(invalid_daterange_str) from err
+
     @property
     def solar_daterange(self) -> "DateRange":
         """
