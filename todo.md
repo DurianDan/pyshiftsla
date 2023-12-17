@@ -1,6 +1,13 @@
 - [X] `Shift`;
     - Refactor the compare method to be Single-res
     - finish method resolve()
-- `DailyShift`:
+- [X]`DailyShift`:
     - add resolve() method for overlapping `Shift`
     - add validation for `Shift`s to be under **24hours**.
+- [ ] `ShiftsBuilder`:
+    - [ ] Generate `DailyShift` with **parsed configuration**:
+        - [ ] Two generators:
+            - for a **range of dates**
+            - for a **duration of hours**
+    - [ ] Validation if the **parsed parameters** are sufficient to generate **Shifts/SLA**
+    
