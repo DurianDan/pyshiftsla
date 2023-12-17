@@ -10,4 +10,7 @@
             - for a **range of dates**
             - for a **duration of hours**
     - [ ] Validation if the **parsed parameters** are sufficient to generate **Shifts/SLA**
-    
+- [ ] `ShiftsBuilder` > export `Shifts` into [*iCalendar*][1] file type
+
+
+[1]: https://support.google.com/calendar/answer/37111?hl=en
