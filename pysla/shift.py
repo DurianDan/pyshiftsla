@@ -160,7 +160,12 @@ class Shift(BaseModel):
         )
         compare_result = self.compare(other)
         match compare_result:
-            case "smaller" | "greater" | "start-connects-end" | "end-connects-start":
+            case (
+                "smaller"
+                | "greater"
+                | "start-connects-end"
+                | "end-connects-start"
+            ):
                 overlapped_shift = None
             case "following":
                 overlapped_shift.start = other.start

@@ -17,10 +17,13 @@ def test_COMMON_DAILY_SHIFTS():
         "COMMON_DAILY_SHIFTS > first shift must be 'smaller' than second shift, not "
         + resolved_shifts["compare_result"]
     )
-    assert resolved_shifts["outer"] == [
-        first_shift,
-        second_shift,
-    ], f"COMMON_DAILY_SHIFTS > outer shifts must be {[first_shift, second_shift]}, not {resolved_shifts['outer']}"
+    assert (
+        resolved_shifts["outer"]
+        == [
+            first_shift,
+            second_shift,
+        ]
+    ), f"COMMON_DAILY_SHIFTS > outer shifts must be {[first_shift, second_shift]}, not {resolved_shifts['outer']}"
 
 
 def test_shift_from_str():

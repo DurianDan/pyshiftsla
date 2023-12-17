@@ -3,19 +3,19 @@
 repos:
   - repo: local
     hooks:
-      - id: black
-        name: black-formatter
-        entry: bash -c 'black .'
+      - id: ruff-format
+        name: ruff-format
+        entry: bash -c 'ruff format .'
         language: system
   - repo: local
     hooks:
-    - id: flake8
-      name: flake8-linter
-      entry: bash -c 'flake8 .'
+    - id: ruff-check
+      name: ruff-check
+      entry: bash -c 'ruff check .'
       language: system
   - repo: local
     hooks:
-      - id: pytest-check
+      - id: pytest
         name: pytest-check
         entry: bash -c 'pytest'
         language: system
