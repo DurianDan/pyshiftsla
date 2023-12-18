@@ -7,9 +7,10 @@
 - [ ] `ShiftsBuilder`:
     - [ ] Generate `DailyShift` with **parsed configuration**:
         - [ ] Two generators:
-            - for a **range of dates**
-            - for a **duration of hours**
-    - [ ] Validation if the **parsed parameters** are sufficient to generate **Shifts/SLA**
+            - [X] for a **range of dates**
+            - [ ] for a **duration of hours**
+    - [X] Validation if the **parsed parameters** are sufficient to generate **Shifts/SLA**
+- [ ] Write tests for `ShiftsBuilder` > `build_shifts_from_daterange` and `calculate_sla`
 - [ ] `ShiftsBuilder` > export `Shifts` into [*iCalendar*][1] file type
 
 
