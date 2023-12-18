@@ -1,6 +1,8 @@
-from typing import Dict, List, Optional, Set
+from typing import List, Optional, Set
 from pydantic import BaseModel
 from datetime import date
+
+from .shiftrange import ShiftRange
 from .daterange import DateRange
 from .daily_shifts import DailyShift
 from .common_daysoff import (
@@ -12,12 +14,10 @@ from .common_daysoff import (
     LUNAR_NEW_YEAR,
     COMMON_WORKDAYS_IN_WEEK,
     COMMON_DAILY_SHIFTS,
-    WEEKDAY,
     WEEKDAYS,
 )
 
 YEAR = MONTH = DAY = int
-SPECIFIED_SHIFTS = Dict[date, DailyShift]
 
 
 class ShiftsBuilder(BaseModel):
@@ -34,7 +34,7 @@ class ShiftsBuilder(BaseModel):
 
     workdays_weekly: WEEKDAYS = COMMON_WORKDAYS_IN_WEEK
     shifts_daily: DailyShift = COMMON_DAILY_SHIFTS
-    days_off: List[DateRange] = [
+    days_off_ranges: List[DateRange] = [
         VIETNAM_VICTORY_DAY,
         VIETNAM_INDEPENDENT_DAY,
         THE_HUNG_KINGS_TEMPLE_FESTIVAL,
@@ -42,21 +42,29 @@ class ShiftsBuilder(BaseModel):
         SOLAR_NEW_YEAR,
         INTERNATIONAL_LABOR_DAY,
     ]
-    special_shifts: SPECIFIED_SHIFTS = {}
+    special_shifts: ShiftRange = ShiftRange({})
+
+    @property
+    def _days_off(self) -> Set[date]:
+        return {
+            day_off
+            for days_off_range in self.days_off_ranges
+            for day_off in days_off_range.dates
+        }
 
     def partial_copy(
         self,
         workdays_weekly: WEEKDAYS | None = None,
         shifts_daily: DailyShift | None = None,
         days_off: List[DateRange] | None = None,
-        special_shifts: SPECIFIED_SHIFTS | None = None,
+        special_shifts: ShiftRange | None = None,
     ) -> "ShiftsBuilder":
         return ShiftsBuilder(
             workdays_weekly=workdays_weekly
             if workdays_weekly
             else self.workdays_weekly,
             shifts_daily=shifts_daily if shifts_daily else self.shifts_daily,
-            days_off=days_off if days_off else self.days_off,
+            days_off_ranges=days_off if days_off else self.days_off_ranges,
             special_shifts=special_shifts
             if special_shifts
             else self.special_shifts,
@@ -66,44 +74,51 @@ class ShiftsBuilder(BaseModel):
         self, days_off: DateRange, inplace: bool = False
     ) -> Optional["ShiftsBuilder"]:
         if inplace:
-            self.days_off.append(days_off)
+            self.days_off_ranges.append(days_off)
             return
-        return self.partial_copy(days_off=self.days_off + [days_off])
+        return self.partial_copy(days_off=self.days_off_ranges + [days_off])
 
-    def add_workday_weekly(
-        self, workday: WEEKDAY, inplace: bool = False
+    def update_workday_weekly(
+        self, workdays: WEEKDAYS, inplace: bool = False
     ) -> Optional["ShiftsBuilder"]:
         if inplace:
-            self.workdays_weekly.add(workday)
+            self.workdays_weekly.update(workdays)
             return
         return self.partial_copy(
-            workdays_weekly=self.workdays_weekly.union({workday})
+            workdays_weekly=self.workdays_weekly.union(workdays)
         )
 
-    def update(
+    def update_special_shifts(
         self,
-        workdays_weekly: WEEKDAYS | None = None,
-        shifts_daily: DailyShift | None = None,
-        days_off: List[DateRange] | None = None,
-        special_shifts: SPECIFIED_SHIFTS | None = None,
-        inplace=True,
+        special_shifts: ShiftRange,
+        inplace: bool = False,
     ) -> Optional["ShiftsBuilder"]:
         if inplace:
-            if workdays_weekly is not None:
-                self.workdays_weekly = workdays_weekly
-            if shifts_daily is not None:
-                self.shifts_daily = shifts_daily
-            if days_off is not None:
-                self.days_off = days_off
-            if special_shifts is not None:
-                self.special_shifts = special_shifts
-            return
-        return self.partial_copy(
-            workdays_weekly=workdays_weekly,
-            shifts_daily=shifts_daily,
-            days_off=days_off,
-            special_shifts=special_shifts,
-        )
+            self.special_shifts.update(special_shifts)
+        return self.partial_copy(special_shifts=special_shifts)
 
-    def generate_shifts(self) -> Dict[date, DailyShift]:
+    def set_shifts_daily(
+        self, shifts_daily: DailyShift, inplace: bool = False
+    ) -> Optional["ShiftsBuilder"]:
+        if inplace:
+            self.shifts_daily = shifts_daily
+            return
+        return self.partial_copy(shifts_daily=shifts_daily)
+
+    def set_days_off(
+        self, days_off: List[DateRange], inplace: bool = False
+    ) -> Optional["ShiftsBuilder"]:
+        if inplace:
+            self.days_off = days_off
+            return
+        return self.partial_copy(days_off=days_off)
+
+    # def build_work_days
+    def build_shifts_from_daterange(self, daterange: DateRange) -> ShiftRange:
+        ...
+
+    def build_shifts_from_hours(
+        self,
+        hours: int,
+    ) -> ShiftRange:
         pass

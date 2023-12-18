@@ -42,10 +42,11 @@ class DateRange(DateRangeConfig):
         """
         Get solar `DateRange`, whatever the `calendar_type` is.
         """
-        if self.calendar_type == "solar":
-            return self
-        else:
-            return self.lunar_to_solar_daterange()
+        match self.calendar_type:
+            case "solar":
+                return self
+            case "lunar":
+                return self.lunar_to_solar_daterange()
 
     @property
     def dates(self) -> List[date]:
