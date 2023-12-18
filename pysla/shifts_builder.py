@@ -1,10 +1,14 @@
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Literal, Dict
 from pydantic import BaseModel
-from datetime import date
+from datetime import date, datetime
+import numpy as np
+import numpy.typing as npt
 
-from .shiftrange import ShiftRange
-from .daterange import DateRange
-from .daily_shifts import DailyShift
+from pysla.shiftrange import ShiftRange
+from pysla.daterange import DateRange
+from pysla.daily_shifts import DailyShift
+from pysla.shift import Shift
+from pysla.datetime_utilities import Milliseconds
 from .common_daysoff import (
     VIETNAM_VICTORY_DAY,
     SOLAR_NEW_YEAR,
@@ -43,6 +47,7 @@ class ShiftsBuilder(BaseModel):
         INTERNATIONAL_LABOR_DAY,
     ]
     special_shifts: ShiftRange = ShiftRange({})
+    _cache_generated_shifts: ShiftRange = ShiftRange({})
 
     @property
     def _days_off(self) -> Set[date]:
@@ -51,6 +56,23 @@ class ShiftsBuilder(BaseModel):
             for days_off_range in self.days_off_ranges
             for day_off in days_off_range.dates
         }
+
+    @property
+    def _numpy_busday_weekmask(self) -> List[Literal[1, 0]]:
+        weekmask = 7 * [0]
+        for day_idx in self.workdays_weekly:
+            weekmask[day_idx] = 1
+        return weekmask
+
+    def is_workday(self, dates_to_check: List[date]) -> npt.NDArray[bool]:
+        return np.is_busday(
+            dates_to_check,
+            weekmask=self._numpy_busday_weekmask,
+            holidays=self._days_off,
+        )
+
+    def get_days_off(self) -> Set[date]:
+        return self._days_off
 
     def partial_copy(
         self,
@@ -70,13 +92,15 @@ class ShiftsBuilder(BaseModel):
             else self.special_shifts,
         )
 
-    def add_days_off(
-        self, days_off: DateRange, inplace: bool = False
+    def add_days_off_range(
+        self, days_off_range: DateRange, inplace: bool = False
     ) -> Optional["ShiftsBuilder"]:
         if inplace:
-            self.days_off_ranges.append(days_off)
+            self.days_off_ranges.append(days_off_range)
             return
-        return self.partial_copy(days_off=self.days_off_ranges + [days_off])
+        return self.partial_copy(
+            days_off=self.days_off_ranges + [days_off_range]
+        )
 
     def update_workday_weekly(
         self, workdays: WEEKDAYS, inplace: bool = False
@@ -97,21 +121,24 @@ class ShiftsBuilder(BaseModel):
             self.special_shifts.update(special_shifts)
         return self.partial_copy(special_shifts=special_shifts)
 
-    def set_shifts_daily(
-        self, shifts_daily: DailyShift, inplace: bool = False
-    ) -> Optional["ShiftsBuilder"]:
-        if inplace:
-            self.shifts_daily = shifts_daily
-            return
-        return self.partial_copy(shifts_daily=shifts_daily)
+    def calculate_sla(
+        self,
+        start_deal: datetime,
+        end_deal: datetime,
+    ) -> Milliseconds:
+        ...
 
-    def set_days_off(
-        self, days_off: List[DateRange], inplace: bool = False
-    ) -> Optional["ShiftsBuilder"]:
-        if inplace:
-            self.days_off = days_off
-            return
-        return self.partial_copy(days_off=days_off)
+    def calculate_work_days_between(
+        self,
+        start_deal: date,
+        end_deal: date,
+    ) -> int:
+        return np.busday_count(
+            start_deal,
+            end_deal,
+            self._numpy_busday_weekmask,
+            self._days_off,
+        )
 
     # def build_work_days
     def build_shifts_from_daterange(self, daterange: DateRange) -> ShiftRange:

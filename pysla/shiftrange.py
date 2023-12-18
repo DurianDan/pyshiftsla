@@ -1,12 +1,12 @@
 from datetime import date
-from typing import Dict
+from typing import Dict, Set
 from pydantic import RootModel
 
-from .daily_shifts import DailyShift
+from pysla.daily_shifts import DailyShift
 
 
 class ShiftRange(RootModel):
-    root: Dict[date, DailyShift | None]
+    root: Dict[date, DailyShift]
 
     def __getitem__(self, key: date) -> DailyShift | None:
         if not isinstance(key, date):
