@@ -111,7 +111,11 @@ class Shift(BaseModel):
             case False, True:
                 return diff_time(self.start, end_work)
             case False, False:
-                return self.diff
+                if start_work < self.start and end_work > self.end:
+                    # if shift is between the start and end work
+                    return self.diff
+                # if there's no shift between start and end work
+                return 0
 
     def _compare_mismatch_startend(
         self, other: "Shift"

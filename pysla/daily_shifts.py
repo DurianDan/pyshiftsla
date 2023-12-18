@@ -1,7 +1,11 @@
 from pydantic import AfterValidator, RootModel
 from typing import Annotated, List, Literal, Dict, Tuple
-from datetime import datetime
-from pysla.datetime_utilities import Milliseconds
+from datetime import datetime, time
+from pysla.datetime_utilities import (
+    Milliseconds,
+    check_start_end_event,
+    diff_time,
+)
 from pysla.shift import Shift, RESOLVED_TWO_SHIFTS
 
 RESOLVE_SHIFTS_METHOD = Literal[
@@ -121,10 +125,27 @@ class DailyShift(RootModel):
             overlapped[idx] = [tmp_shift, next_tmp_shift]
         return overlapped
 
+    @property
     def total_milliseconds(self) -> Milliseconds:
-        return sum([shift.diff for shift in self])
+        return sum([shift.diff for shift in self.root])
 
     def work_amount_in_shifts(
-        self, start_work: datetime, end_work: datetime
+        self,
+        start_work: time,
+        end_work: time,
+        default_if_no_shifts_are_between: Literal["diff"] | int = "diff",
     ) -> Milliseconds:
-        pass
+        check_start_end_event(start_work, end_work)
+        work_amount_in_shifts = sum(
+            [
+                shift.work_amount_in_shift(start_work, end_work)
+                for shift in self.root
+            ]
+        )
+        if work_amount_in_shifts == 0:
+            work_amount_in_shifts = (
+                diff_time(start_work, end_work)
+                if default_if_no_shifts_are_between == "diff"
+                else default_if_no_shifts_are_between
+            )
+        return work_amount_in_shifts
