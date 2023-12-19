@@ -1,4 +1,4 @@
-from typing import List, Optional, Set, Literal, Dict
+from typing import List, Optional, Set, Literal
 from pydantic import BaseModel
 from datetime import date, datetime
 import numpy as np
@@ -33,20 +33,22 @@ class ShiftsBuilder(BaseModel):
 
     workdays_weekly: WEEKDAYS = COMMON_WORKDAYS_IN_WEEK
     shifts_daily: DailyShift = COMMON_DAILY_SHIFTS
-    days_off_ranges: List[DateRange] = []
+    days_off_ranges: List[DateRange | date] = []
     special_shifts: ShiftRange = ShiftRange({})
 
-    generated_shifts: ShiftRange | None = None
+    _generated_shifts: ShiftRange | None = None
 
     @property
     def _days_off(self) -> Set[date]:
-        return {
-            day_off
-            for days_off_range in self.days_off_ranges
-            for day_off in days_off_range.dates  # generated dates of each `DateRange`
-            # 'dates' specified in `special_shifts` overwrite dates in `days_off_ranges`
-            if day_off not in self.special_shifts
-        }
+        if len(self.days_off_ranges) == 0:
+            return set()
+        days_off = set()
+        for dates_indicator in self.days_off_ranges:
+            if isinstance(dates_indicator, date):
+                days_off.add(dates_indicator)
+            elif isinstance(dates_indicator, DateRange):
+                days_off.update(dates_indicator.dates)
+        return days_off
 
     @property
     def _numpy_busday_weekmask(self) -> List[Literal[1, 0]]:
@@ -55,31 +57,35 @@ class ShiftsBuilder(BaseModel):
             weekmask[day_idx] = 1
         return weekmask
 
-    def is_workday(self, dates_to_check: List[date]) -> npt.NDArray[bool]:
+    def is_workday(self, dates_to_check: List[date]) -> npt.NDArray[np.bool_]:
         return np.is_busday(
             dates_to_check,
             weekmask=self._numpy_busday_weekmask,
-            holidays=self._days_off,
+            holidays=list(self._days_off),
         )
 
     def get_workdays(self, from_date: date, to_date: date) -> List[date]:
-        workdays: pd.DatetimeIndex = pd.date_range(
+        raw_dates = pd.date_range(
             start=from_date, end=to_date, freq="d"
-        )
-        return workdays[self.is_workday(workdays)].to_pydatetime().tolist()
+        ).date.tolist()
+        check_workdays = self.is_workday(raw_dates)
+        return [
+            workday
+            for idx, workday in enumerate(raw_dates)
+            if check_workdays[idx]
+        ]
 
     def get_days_off(self) -> Set[date]:
         return self._days_off
 
-    def partial_copy(
+    def partial_config_copy(
         self,
         workdays_weekly: WEEKDAYS | None = None,
         shifts_daily: DailyShift | None = None,
-        days_off: List[DateRange] | None = None,
+        days_off: List[DateRange | date] | None = None,
         special_shifts: ShiftRange | None = None,
     ) -> "ShiftsBuilder":
         return ShiftsBuilder(
-            generated_shifts=self.generated_shifts,
             shifts_daily=shifts_daily if shifts_daily else self.shifts_daily,
             days_off_ranges=days_off if days_off else self.days_off_ranges,
             workdays_weekly=workdays_weekly
@@ -91,12 +97,12 @@ class ShiftsBuilder(BaseModel):
         )
 
     def add_days_off_range(
-        self, days_off_range: DateRange, inplace: bool = False
+        self, days_off_range: DateRange | date, inplace: bool = False
     ) -> Optional["ShiftsBuilder"]:
         if inplace:
             self.days_off_ranges.append(days_off_range)
             return
-        return self.partial_copy(
+        return self.partial_config_copy(
             days_off=self.days_off_ranges + [days_off_range]
         )
 
@@ -106,7 +112,7 @@ class ShiftsBuilder(BaseModel):
         if inplace:
             self.workdays_weekly.update(workdays)
             return
-        return self.partial_copy(
+        return self.partial_config_copy(
             workdays_weekly=self.workdays_weekly.union(workdays)
         )
 
@@ -117,7 +123,7 @@ class ShiftsBuilder(BaseModel):
     ) -> Optional["ShiftsBuilder"]:
         if inplace:
             self.special_shifts.update(special_shifts)
-        return self.partial_copy(special_shifts=special_shifts)
+        return self.partial_config_copy(special_shifts=special_shifts)
 
     def calculate_work_days_between(
         self,
@@ -135,14 +141,14 @@ class ShiftsBuilder(BaseModel):
         self, from_date: datetime, to_date: datetime
     ) -> ShiftRange:
         workdays = self.get_workdays(from_date, to_date)
-        self.generated_shifts = ShiftRange(
+        self._generated_shifts = ShiftRange(
             {workday: self.shifts_daily for workday in workdays}
         )
-        self.generated_shifts.update(self.special_shifts)
-        return self.generated_shifts
+        self._generated_shifts.update(self.special_shifts)
+        return self._generated_shifts
 
     def get_generated_shifts(self) -> ShiftRange | None:
-        return self.generated_shifts
+        return self._generated_shifts
 
     def calculate_sla(
         self,
@@ -154,7 +160,7 @@ class ShiftsBuilder(BaseModel):
         start_deal_date, end_deal_date = start_deal.date(), end_deal.date()
         if use_generated_shifts:
             self.build_shifts_from_daterange(start_deal_date, end_deal_date)
-        return self.generated_shifts.work_amount_in_shiftrannge(
+        return self._generated_shifts.work_amount_in_shiftrannge(
             start_deal, end_deal, default_if_no_shifts_are_between
         )
 

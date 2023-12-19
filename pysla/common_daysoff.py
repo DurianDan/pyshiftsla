@@ -10,14 +10,6 @@ from typing import Set
 WEEKDAY = Annotated[int, AfterValidator(check_valid_weekday)]
 WEEKDAYS = Set[WEEKDAY]
 
-VIETNAM_VICTORY_DAY = DateRange.fromstr("20240430")
-SOLAR_NEW_YEAR = DateRange.fromstr("20240101")
-INTERNATIONAL_LABOR_DAY = DateRange.fromstr("20240501")
-VIETNAM_INDEPENDENT_DAY = DateRange.fromstr("20240902-20240903")
-LUNAR_NEW_YEAR = DateRange.fromstr("20240101-20240105", calendar_type="lunar")
-THE_HUNG_KINGS_TEMPLE_FESTIVAL = DateRange.fromstr(
-    "20240310", calendar_type="lunar"
-)
 COMMON_WORKDAYS_IN_WEEK: WEEKDAYS = {0, 1, 2, 3, 4}
 COMMON_DAILY_SHIFTS = DailyShift(
     [

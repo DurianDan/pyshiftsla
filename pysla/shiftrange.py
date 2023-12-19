@@ -22,12 +22,19 @@ class ShiftRange(RootModel):
     def update(self, to_update: "ShiftRange") -> None:
         self.root.update(to_update.root)
 
-    def total_milliseconds(self, exclude: List[date] = []) -> Milliseconds:
+    def total_milliseconds(
+        self,
+        from_date: date,
+        to_date: date,
+        exclude: List[date] = [],
+    ) -> Milliseconds:
         return sum(
             [
                 daily_shifts.total_milliseconds()
                 for specified_date, daily_shifts in self.root.items()
                 if specified_date not in exclude
+                and specified_date >= from_date
+                and specified_date <= to_date
             ]
         )
 
@@ -54,7 +61,7 @@ class ShiftRange(RootModel):
                 time(0, 1), end_work.time(), default_if_no_shifts_are_between
             )
             remaining_shifts = self.total_milliseconds(
-                [start_work_date, end_work_date]
+                start_work_date, end_work_date, [start_work_date, end_work_date]
             )
             calculated_workamount = (
                 start_day_workamount + end_day_workamount + remaining_shifts
