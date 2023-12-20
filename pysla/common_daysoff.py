@@ -14,6 +14,6 @@ COMMON_WORKDAYS_IN_WEEK: WEEKDAYS = {0, 1, 2, 3, 4}
 COMMON_DAILY_SHIFTS = DailyShift(
     [
         Shift(start=time(8, 30), end=time(11, 45)),
-        Shift(start=time(13, 15), end=time(17, 45)),
+        Shift(start=time(13, 30), end=time(18, 00)),
     ]
 )
