@@ -51,8 +51,6 @@ exclude = [
 # Same as Black.
 line-length = 80
 indent-width = 4
-
-# Assume Python 3.8
 target-version = "py310"
 
 [tool.ruff.lint]

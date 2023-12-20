@@ -25,12 +25,13 @@ class DateRange(DateRangeConfig):
         assert len(dates_component) in [1, 2], invalid_daterange_str
         end_date = None
         try:
+            format_datestr = lambda idx: datetime.strptime(  # noqa: E731
+                dates_component[idx], date_format
+            ).date()
             if len(dates_component) == 2 and dates_component[1] != "":
-                end_date = datetime.strptime(
-                    dates_component[0], date_format
-                ).date()
+                end_date = format_datestr(1)
             return DateRange(
-                start=datetime.strptime(dates_component[0], date_format).date(),
+                start=format_datestr(0),
                 end=end_date,
                 calendar_type=calendar_type,
             )

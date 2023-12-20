@@ -5,6 +5,15 @@ from pysla.daily_shifts import DailyShift
 from pysla.daterange import DateRange
 from pysla.shift import Shift
 
+from tests.test_objects.manual import (
+    SOLAR_NEW_YEAR,
+    US_INDEPENDENCE_DAY,
+    VIETNAM_VICTORY_DAY,
+    VIETNAM_INDEPENDENCE_DAY,
+    VIETNAMESE_LUNAR_NEW_YEAR,
+    VIETNAM_HUNGS_KING_FESTIVAL,
+)
+
 from datetime import date
 
 COMPANY_SHIFTS_BUILDER = ShiftsBuilder(
@@ -23,21 +32,15 @@ COMPANY_SHIFTS_BUILDER = ShiftsBuilder(
     - 1 day from home country's Independence Days (2024-07-04) (+1 holiday leave)
 - Overtime work in the Solar New Year: from 13:30 to 14:30
 """
-US_WOMAN_lIVING_IN_VIETNAM_PREGNANT_LEAVE_6MONTHS_PARTTIME_2024 = (
+US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024 = (
     COMPANY_SHIFTS_BUILDER.partial_config_copy(
         days_off_ranges=[
-            date(2024, 7, 4),  # US National Day/Independence Day
-            date(2024, 1, 1),  # Solar New Year
-            DateRange.fromstr("20240430-20230501"),  # Vietname Victory day
-            DateRange.fromstr(
-                "20240902-20230903"
-            ),  # Vietnam National Day/Independence Day
-            DateRange.fromstr(
-                "20240101-20240105", calendar_type="lunar"
-            ),  # Vietnamese Lunar New Year
-            DateRange.fromstr(
-                "20240310", calendar_type="lunar"
-            ),  # Vietnamese Hungs King Festival]
+            SOLAR_NEW_YEAR,
+            US_INDEPENDENCE_DAY,
+            VIETNAM_VICTORY_DAY,
+            VIETNAM_INDEPENDENCE_DAY,
+            VIETNAMESE_LUNAR_NEW_YEAR,
+            VIETNAM_HUNGS_KING_FESTIVAL,
             DateRange.fromstr(
                 "20240801-20241201"
             ),  # 4 months of maternity leave
@@ -57,6 +60,13 @@ US_WOMAN_lIVING_IN_VIETNAM_PREGNANT_LEAVE_6MONTHS_PARTTIME_2024 = (
 )
 
 if __name__ == "__main__":
-    print(
-        US_WOMAN_lIVING_IN_VIETNAM_PREGNANT_LEAVE_6MONTHS_PARTTIME_2024.get_days_off()
+    from icecream import ic
+
+    # ic(
+    #     US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.get_days_off()
+    # )
+    ic(
+        US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.build_shifts_from_daterange(
+            from_date=date(2024, 1, 1), to_date=date(2024, 12, 30)
+        )
     )

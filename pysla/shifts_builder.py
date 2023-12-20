@@ -46,7 +46,7 @@ class ShiftsBuilder(BaseModel):
         for dates_indicator in self.days_off_ranges:
             if isinstance(dates_indicator, date):
                 days_off.add(dates_indicator)
-            elif isinstance(dates_indicator, DateRange):
+            else:
                 days_off.update(dates_indicator.dates)
         return days_off
 
@@ -75,7 +75,7 @@ class ShiftsBuilder(BaseModel):
         raw_dates = pd.date_range(
             start=from_date, end=to_date, freq="d"
         ).date.tolist()
-        return self.is_workday(raw_dates, returned_as="filtered_dates")
+        return self.is_workday(raw_dates, returned_as="filtered_dates").tolist()
 
     def get_days_off(self) -> Set[date]:
         return self._days_off

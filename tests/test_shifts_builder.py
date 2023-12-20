@@ -1,13 +1,10 @@
-from pysla.shifts_builder import ShiftsBuilder
-from pysla.daily_shifts import DailyShift
-from pysla.shift import Shift
-from pysla.daterange import DateRange
-
 from datetime import date
-# from .test_objects import DEFAULT_SHIFTS_BUILDER
+from tests.test_objects.shifts_builder import (
+    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024,
+)
 
 
-# def test_shifts_builder():
-#     DEFAULT_SHIFTS_BUILDER.build_shifts_from_daterange(
-#         date(2023, 1, 12), date(2024, 6, 19)
-#     )
+def test_shifts_builder():
+    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.build_shifts_from_daterange(
+        from_date=date(2024, 1, 1), to_date=date(2024, 12, 30)
+    )
