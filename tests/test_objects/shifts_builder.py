@@ -32,7 +32,7 @@ COMPANY_SHIFTS_BUILDER = ShiftsBuilder(
     - 1 day from home country's Independence Days (2024-07-04) (+1 holiday leave)
 - Overtime work in the Solar New Year: from 13:30 to 14:30
 """
-US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024 = (
+US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024 = (
     COMPANY_SHIFTS_BUILDER.partial_config_copy(
         days_off_ranges=[
             SOLAR_NEW_YEAR,
@@ -63,18 +63,18 @@ if __name__ == "__main__":
     from icecream import ic
 
     # ic(
-    #     US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.get_days_off()
+    #     US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.get_days_off()
     # )
-    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.build_shifts_from_daterange(
+    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.build_shifts_from_daterange(
         from_date=date(2024, 1, 1), to_date=date(2024, 12, 30)
     )
-    generated_shifts = US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.get_generated_shifts()
+    generated_shifts = US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.get_generated_shifts()
 
     ic(generated_shifts[date(2024, 1, 2)])
     ic(generated_shifts[date(2024, 1, 2)].total_milliseconds / (1000 * 3600))
 
     ic(
-        US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.calculate_sla(
+        US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.calculate_sla(
             start_deal=datetime(2024, 1, 1, 14, 0),
             end_deal=datetime(2024, 1, 3, 9, 30),
             use_generated_shifts=True,

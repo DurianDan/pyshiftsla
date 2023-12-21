@@ -2,16 +2,16 @@ from datetime import date, datetime
 
 from tests.test_objects.manual import TEST_YEAR
 from tests.test_objects.shifts_builder import (
-    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024,
+    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024,
 )
 
 
 def test_shifts_builder():
-    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.build_shifts_from_daterange(
+    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.build_shifts_from_daterange(
         from_date=date(TEST_YEAR, 1, 1), to_date=date(TEST_YEAR, 12, 30)
     )
     millis_sla_new_year_day = (
-        US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.calculate_sla(
+        US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.calculate_sla(
             start_deal=datetime(TEST_YEAR, 1, 1, 14),
             end_deal=datetime(TEST_YEAR, 1, 2, 9, 30),
             use_generated_shifts=True,
