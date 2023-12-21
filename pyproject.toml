@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pysla"
+name = "pyshiftsla"
 version = "0.1.0"
 description = "Highly customizable SLA and work-shifts Generator, for any time-keeping and days-off policies"
 authors = ["Huy Vu Nguyen <huyk25sinh@gmail.com>"]

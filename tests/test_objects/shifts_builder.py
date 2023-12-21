@@ -1,9 +1,12 @@
-from pysla.common_daysoff import COMMON_DAILY_SHIFTS, COMMON_WORKDAYS_IN_WEEK
-from pysla.shifts_builder import ShiftsBuilder
-from pysla.shiftrange import ShiftRange
-from pysla.daily_shifts import DailyShift
-from pysla.daterange import DateRange
-from pysla.shift import Shift
+from pyshiftsla.common_daysoff import (
+    COMMON_DAILY_SHIFTS,
+    COMMON_WORKDAYS_IN_WEEK,
+)
+from pyshiftsla.shifts_builder import ShiftsBuilder
+from pyshiftsla.shiftrange import ShiftRange
+from pyshiftsla.daily_shifts import DailyShift
+from pyshiftsla.daterange import DateRange
+from pyshiftsla.shift import Shift
 
 from tests.test_objects.manual import (
     SOLAR_NEW_YEAR,

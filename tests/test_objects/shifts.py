@@ -1,11 +1,11 @@
 from datetime import date
 from typing import Tuple, List
 
-from pysla.shift import Shift, SHIFT_STRING, COMPARE_TO_ANOTHER_SHIFT
-from pysla.shiftrange import ShiftRange
-from pysla.shifts_builder import ShiftsBuilder
-from pysla.daily_shifts import DailyShift
-from pysla.daterange import DateRange
+from pyshiftsla.shift import Shift, SHIFT_STRING, COMPARE_TO_ANOTHER_SHIFT
+from pyshiftsla.shiftrange import ShiftRange
+from pyshiftsla.shifts_builder import ShiftsBuilder
+from pyshiftsla.daily_shifts import DailyShift
+from pyshiftsla.daterange import DateRange
 
 left_shift_str = "10101110"
 RIGHT_SHIFTS_TO_COMPARE_STR: Tuple[

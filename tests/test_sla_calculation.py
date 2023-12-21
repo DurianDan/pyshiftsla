@@ -1,4 +1,4 @@
-from pysla.shifts_builder import ShiftsBuilder, DailyShift
+from pyshiftsla.shifts_builder import ShiftsBuilder, DailyShift
 
 
 def test_default_shiftsbuilder():

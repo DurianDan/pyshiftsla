@@ -2,8 +2,8 @@ from datetime import date, time, datetime
 from typing import Dict, Literal, List
 from pydantic import RootModel
 
-from pysla.daily_shifts import DailyShift
-from pysla.datetime_utilities import Milliseconds, diff_datetime
+from pyshiftsla.daily_shifts import DailyShift
+from pyshiftsla.datetime_utilities import Milliseconds, diff_datetime
 
 
 class ShiftRange(RootModel):

@@ -1,6 +1,6 @@
 from datetime import date
 
-from pysla.daterange import DateRange
+from pyshiftsla.daterange import DateRange
 
 
 TEST_YEAR = 2024
