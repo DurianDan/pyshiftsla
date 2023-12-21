@@ -60,7 +60,8 @@ US_WOMAN_LIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024 = ShiftsBuilder(
     ),
 )
 ```
-
+- To generate `Shift`s, here is `ShiftsBuilder` priority:  
+> special_shift > days_off_ranges > daily_shifts + workday_weekly
 #### 3. Generate `ShiftRange` for year 2024
 - `ShiftRange` works like a dictionary, and can check the generated `Shift` at a specific `date`.
 ```python
