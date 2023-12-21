@@ -12,6 +12,6 @@ VIETNAM_INDEPENDENCE_DAY = DateRange.fromstr(f"{TEST_YEAR}0902-{TEST_YEAR}0903")
 VIETNAMESE_LUNAR_NEW_YEAR = DateRange.fromstr(
     f"{TEST_YEAR}0101-{TEST_YEAR}0105", calendar_type="lunar"
 )
-VIETNAM_HUNGS_KING_FESTIVAL = DateRange.fromstr(
+VIETNAM_HUNG_KINGS_FESTIVAL = DateRange.fromstr(
     f"{TEST_YEAR}0310", calendar_type="lunar"
 )

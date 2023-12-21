@@ -149,3 +149,12 @@ class DailyShift(RootModel):
                 else default_if_no_shifts_are_between
             )
         return work_amount_in_shifts
+
+    def shifts_from_duration(
+        self,
+        start_work: time,
+        end_work: time,
+        milliseconds_duration: int,
+    ) -> "DailyShift":
+        # if milliseconds_duration >= self.total_milliseconds:
+        ...

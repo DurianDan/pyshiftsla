@@ -11,10 +11,10 @@ from tests.test_objects.manual import (
     VIETNAM_VICTORY_DAY,
     VIETNAM_INDEPENDENCE_DAY,
     VIETNAMESE_LUNAR_NEW_YEAR,
-    VIETNAM_HUNGS_KING_FESTIVAL,
+    VIETNAM_HUNG_KINGS_FESTIVAL,
 )
 
-from datetime import date
+from datetime import date, datetime
 
 COMPANY_SHIFTS_BUILDER = ShiftsBuilder(
     # from 8:30 to 11:45
@@ -40,7 +40,7 @@ US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024 = (
             VIETNAM_VICTORY_DAY,
             VIETNAM_INDEPENDENCE_DAY,
             VIETNAMESE_LUNAR_NEW_YEAR,
-            VIETNAM_HUNGS_KING_FESTIVAL,
+            VIETNAM_HUNG_KINGS_FESTIVAL,
             DateRange.fromstr(
                 "20240801-20241201"
             ),  # 4 months of maternity leave
@@ -65,8 +65,19 @@ if __name__ == "__main__":
     # ic(
     #     US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.get_days_off()
     # )
+    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.build_shifts_from_daterange(
+        from_date=date(2024, 1, 1), to_date=date(2024, 12, 30)
+    )
+    generated_shifts = US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.get_generated_shifts()
+
+    ic(generated_shifts[date(2024, 1, 2)])
+    ic(generated_shifts[date(2024, 1, 2)].total_milliseconds / (1000 * 3600))
+
     ic(
-        US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.build_shifts_from_daterange(
-            from_date=date(2024, 1, 1), to_date=date(2024, 12, 30)
+        US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_6MONTHS_2024.calculate_sla(
+            start_deal=datetime(2024, 1, 1, 14, 0),
+            end_deal=datetime(2024, 1, 3, 9, 30),
+            use_generated_shifts=True,
         )
+        / (1000 * 3600)
     )

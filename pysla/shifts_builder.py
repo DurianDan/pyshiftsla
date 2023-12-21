@@ -3,12 +3,11 @@ from pydantic import BaseModel
 from datetime import date, datetime
 import numpy as np
 import numpy.typing as npt
-import pandas as pd
+import polars as pl
 
 from pysla.shiftrange import ShiftRange
 from pysla.daterange import DateRange
 from pysla.daily_shifts import DailyShift
-from pysla.shift import Shift
 from pysla.datetime_utilities import Milliseconds
 from pysla.common_daysoff import (
     COMMON_WORKDAYS_IN_WEEK,
@@ -72,9 +71,9 @@ class ShiftsBuilder(BaseModel):
         return checks
 
     def get_workdays(self, from_date: date, to_date: date) -> List[date]:
-        raw_dates = pd.date_range(
-            start=from_date, end=to_date, freq="d"
-        ).date.tolist()
+        raw_dates = pl.date_range(
+            start=from_date, end=to_date, eager=True
+        ).to_list()
         return self.is_workday(raw_dates, returned_as="filtered_dates").tolist()
 
     def get_days_off(self) -> Set[date]:
@@ -144,6 +143,12 @@ class ShiftsBuilder(BaseModel):
     def build_shifts_from_daterange(
         self, from_date: datetime, to_date: datetime
     ) -> ShiftRange:
+        """
+        Build `Shift`s from `from_date` and `to_date`
+        :param `from_date`: start date of the range
+        :param `to_date`: end date of the range
+        :return: `ShiftRange` with `Shift`s
+        """
         workdays = self.get_workdays(from_date, to_date)
         self._generated_shifts = ShiftRange(
             {workday: self.shifts_daily for workday in workdays}
@@ -161,16 +166,25 @@ class ShiftsBuilder(BaseModel):
         use_generated_shifts: bool = False,
         default_if_no_shifts_are_between: Literal["diff"] | int = "diff",
     ) -> Milliseconds:
+        """
+        Calculate sla based on `start_deal` and `end_deal`
+        :param `use_generated_shifts`: If `False`, `ShiftRange`s will be generated from `start_deal` and `end_deal`. If `True`, `ShiftRange` will be reused, generated from other methods (`build_shifts_from_daterange`)
+        :param `default_if_no_shifts_are_between`: is used no `Shift`s are found between `start_deal` and `end_deal`. If `"diff"`, method will calculate `Milliseconds` between `start_deal` and `end_deal`
+        """
         start_deal_date, end_deal_date = start_deal.date(), end_deal.date()
         if use_generated_shifts:
             self.build_shifts_from_daterange(start_deal_date, end_deal_date)
-        return self._generated_shifts.work_amount_in_shiftrannge(
+        return self._generated_shifts.work_amount_in_shiftrange(
             start_deal, end_deal, default_if_no_shifts_are_between
         )
 
-    def build_shifts_from_hours(
+    def build_shifts_from_duration(
         self,
-        hours: int,
+        hours_duration: int,
         from_timestamp: datetime = datetime.now(),
+        use_generated_shifts: bool = False,
     ) -> ShiftRange:
+        """
+        Build `Shift`s from `hours` based on `from_timestamp`
+        """
         pass

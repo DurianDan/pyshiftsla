@@ -1,5 +1,5 @@
-from typing import List, Literal, Optional, Tuple
-import pandas as pd
+from typing import List, Literal, Optional
+import polars as pl
 from pydantic import BaseModel
 from datetime import date, datetime
 from lunardate import LunarDate
@@ -57,12 +57,9 @@ class DateRange(DateRangeConfig):
         daterange = self.solar_daterange
         if not self.end:
             return [daterange.start]
-        datetime_in_range = (
-            pd.date_range(start=daterange.start, end=daterange.end, freq="d")
-            .to_pydatetime()
-            .tolist()
-        )
-        dates_in_range: List[date] = [dt.date() for dt in datetime_in_range]
+        dates_in_range: List[date] = pl.date_range(
+            start=daterange.start, end=daterange.end, eager=True
+        ).to_list()
         return dates_in_range
 
     def lunar_to_solar_daterange(self) -> "DateRange":
