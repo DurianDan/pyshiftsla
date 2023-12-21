@@ -5,3 +5,4 @@ __pycache__/
 dumb.py
 .vscode
 .coverage
+.env

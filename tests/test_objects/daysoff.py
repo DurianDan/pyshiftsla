@@ -1,4 +1,4 @@
-from pysla.common_daysoff import COMMON_WORKDAYS_IN_WEEK
+from pyshiftsla.common_daysoff import COMMON_WORKDAYS_IN_WEEK
 from tests.test_objects.manual import TEST_YEAR
 from tests.test_utils import generate_monthly_days_off
 

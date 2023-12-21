@@ -1,12 +1,12 @@
 from pydantic import AfterValidator, RootModel
 from typing import Annotated, List, Literal, Dict, Tuple
 from datetime import datetime, time
-from pysla.datetime_utilities import (
+from pyshiftsla.datetime_utilities import (
     Milliseconds,
     check_start_end_event,
     diff_time,
 )
-from pysla.shift import Shift, RESOLVED_TWO_SHIFTS
+from pyshiftsla.shift import Shift, RESOLVED_TWO_SHIFTS
 
 RESOLVE_SHIFTS_METHOD = Literal[
     "overlapped", "outer", "throw-error", "delete-both"

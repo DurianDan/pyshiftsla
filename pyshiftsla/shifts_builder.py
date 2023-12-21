@@ -5,11 +5,11 @@ import numpy as np
 import numpy.typing as npt
 import polars as pl
 
-from pysla.shiftrange import ShiftRange
-from pysla.daterange import DateRange
-from pysla.daily_shifts import DailyShift
-from pysla.datetime_utilities import Milliseconds
-from pysla.common_daysoff import (
+from pyshiftsla.shiftrange import ShiftRange
+from pyshiftsla.daterange import DateRange
+from pyshiftsla.daily_shifts import DailyShift
+from pyshiftsla.datetime_utilities import Milliseconds
+from pyshiftsla.common_daysoff import (
     COMMON_WORKDAYS_IN_WEEK,
     COMMON_DAILY_SHIFTS,
     WEEKDAYS,
