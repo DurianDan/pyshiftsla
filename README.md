@@ -1,6 +1,12 @@
-# pysla
+[![Python package](https://github.com/DurianDan/pyshiftsla/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/DurianDan/pyshiftsla/actions/workflows/python-package.yml)
+
+# pyshiftsla
     Highly customizable SLA calculator and Work shift Generator, for any time-keeping and days-off policies
+- repo: https://github.com/DurianDan/pyshiftsla
+- PyPi: https://pypi.org/project/pyshiftsla/
 ---
+## Install
+    pip install pyshiftsla
 ### Quickstart - A case in Vietnam's Law:
 - Let's calculate **SLA** and **generate work shifts** for an **American** female employee, Working in **Vietnam**, about to take maternity leave.
 - Law references: [(1)][1]; [(2)][2]
