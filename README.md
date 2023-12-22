@@ -1,7 +1,8 @@
 [![Python package](https://github.com/DurianDan/pyshiftsla/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/DurianDan/pyshiftsla/actions/workflows/python-package.yml)
 
 # pyshiftsla
-    Highly customizable SLA calculator and Work shift Generator, for any time-keeping and days-off policies
+    Highly customizable SLA calculator and Work shift Generator,
+        for any time-keeping and days-off policies
 - repo: https://github.com/DurianDan/pyshiftsla
 - PyPi: https://pypi.org/project/pyshiftsla/
 ---
