@@ -40,7 +40,8 @@ US_WOMAN_LIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024 = ShiftsBuilder(
         date(2024, 7, 4), # US_INDEPENDENCE_DAY
         DateRange.fromstr("20240430-20240501"), #VIETNAM_VICTORY_DAY
         DateRange.fromstr("20240902-20240903"), #VIETNAM_INDEPENDENCE_DAY
-        #VIETNAMESE_LUNAR_NEW_YEAR, Lunar DateRange will automatically turn into Solar DateRange
+        #VIETNAMESE_LUNAR_NEW_YEAR,
+        # Lunar DateRange will automatically turn into Solar DateRange
         DateRange.fromstr("20240101-20240105", calendar_type="lunar") 
         #VIETNAM_LUNAR_HUNG_KINGS_FESTIVAL
         DateRange.fromstr("20240310", calendar_type="lunar")
@@ -84,8 +85,7 @@ generated_shiftrange[date(2024,2,8)]
 # ]
 
 # Get Shifts in a day off (holiday leave) 2024-07-04
-# KeyError: datetime.date(2024, 2, 9)
-generated_shiftrange[date(2024,7,4)]
+generated_shiftrange[date(2024,7,4)] # KeyError: datetime.date(2024, 7, 4)
 generated_shiftrange.get(date(2024,7,4)) # None
 ```
 
