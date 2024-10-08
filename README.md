@@ -1,4 +1,5 @@
 [![Python package](https://github.com/DurianDan/pyshiftsla/actions/workflows/python-package.yml/badge.svg?branch=main)](https://github.com/DurianDan/pyshiftsla/actions/workflows/python-package.yml)
+[![Downloads](https://static.pepy.tech/badge/pyshiftsla)](https://pepy.tech/project/pyshiftsla)
 
 # pyshiftsla
     Highly customizable SLA calculator and Work shift Generator,
