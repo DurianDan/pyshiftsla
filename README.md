@@ -23,7 +23,8 @@
 
 #### 2. Configuration for `ShiftsBuilder`
 ```python
-from pysla.shifts_builder import ShiftsBuilder, Shift, DateRange
+from pyshiftsla.shifts_builder import ShiftsBuilder, DateRange, DailyShift, ShiftRange
+from pyshiftsla.shift import Shift
 from datetime import time, date
 
 US_WOMAN_LIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024 = ShiftsBuilder(
@@ -43,9 +44,9 @@ US_WOMAN_LIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024 = ShiftsBuilder(
         DateRange.fromstr("20240902-20240903"), #VIETNAM_INDEPENDENCE_DAY
         #VIETNAMESE_LUNAR_NEW_YEAR,
         # Lunar DateRange will automatically turn into Solar DateRange
-        DateRange.fromstr("20240101-20240105", calendar_type="lunar") 
+        DateRange.fromstr("20240101-20240105", calendar_type="lunar"),
         #VIETNAM_LUNAR_HUNG_KINGS_FESTIVAL
-        DateRange.fromstr("20240310", calendar_type="lunar")
+        DateRange.fromstr("20240310", calendar_type="lunar"),
 
         # 4 months of maternity leave
         DateRange.fromstr("20240801-20241201"),
@@ -76,17 +77,17 @@ generated_shiftrange = ( # ShiftRange for 2024
     )
 # Get Shifts in New Year 2024-01-01
 generated_shiftrange[date(2024,1,1)] 
-# [Shift(start=datetime.time(13, 30), end=datetime.time(14, 30))]
+# [Shift(start=time(13, 30), end=time(14, 30))]
 
 # Get Shifts in a random working day
 generated_shiftrange[date(2024,2,8)]
 # [
-#   Shift(start=datetime.time(8, 30), end=datetime.time(11, 45)), 
-#   Shift(start=datetime.time(13, 30), end=datetime.time(18, 0)) 
+#   Shift(start=time(8, 30), end=time(11, 45)), 
+#   Shift(start=time(13, 30), end=time(18, 0)) 
 # ]
 
 # Get Shifts in a day off (holiday leave) 2024-07-04
-generated_shiftrange[date(2024,7,4)] # KeyError: datetime.date(2024, 7, 4)
+generated_shiftrange[date(2024,7,4)] # KeyError: date(2024, 7, 4)
 generated_shiftrange.get(date(2024,7,4)) # None
 ```
 
@@ -94,7 +95,7 @@ generated_shiftrange.get(date(2024,7,4)) # None
 - The result will be in `Milliseconds`:
 ```python
 sla_millis = (
-    US_WOMAN_lIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024
+    US_WOMAN_LIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024
     .calculate_sla(
         start_deal=datetime(2024, 1, 1, 14),
         end_deal=datetime(2024, 1, 2, 9, 30),
@@ -109,7 +110,7 @@ sla_hours = sla_millis/(1000*60*60) # 1.5 hours
 
 ### Global `ShiftsBuilder` config for your company/team
 ```python
-from pysla.shifts_builder import ShiftsBuilder, Shift
+from pyshiftsla.shifts_builder import ShiftsBuilder, Shift
 from datetime import time
 
 COMPANY_SHIFTS_BUILDER = ShiftsBuilder(
@@ -127,7 +128,7 @@ employee_takes_4_days_off = (
     .add_days_off_range(
         [
             DateRange.fromstr("20241204-20241205"), # 2days off
-            DateRange.fromstr("20241000-20241001") # 2days off
+            DateRange.fromstr("20240930-20241001") # 2days off
         ],
         inplace=False # if `False` will return a copied `ShiftsBuilder`,
         # if `True`, will change `COMPANY_SHIFTS_BUILDER` and return `None`
