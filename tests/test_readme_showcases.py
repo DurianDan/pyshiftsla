@@ -78,6 +78,7 @@ def test_readme_first_showcase_us_woman():
     with pytest.raises(KeyError):
         # KeyError: datetime.date(2024, 7, 4)
         generated_shiftrange[date(2024, 7, 4)]
+    assert generated_shiftrange.get(date(2024, 7, 4)) is None
 
 
 def test_readme_second_showcase_us_woman_sla():

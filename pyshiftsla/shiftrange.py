@@ -9,12 +9,19 @@ from pyshiftsla.datetime_utilities import Milliseconds, diff_datetime
 class ShiftRange(RootModel):
     root: Dict[date, DailyShift]
 
-    def __getitem__(self, key: date) -> DailyShift | None:
+    def __getitem__(self, key: date) -> DailyShift:
         if not isinstance(key, date):
             raise NotImplementedError(
                 f"Only accept key as `date` not {type(key)}"
             )
         return self.root[key]
+
+    def get(self, key: date) -> DailyShift | None:
+        if not isinstance(key, date):
+            raise NotImplementedError(
+                f"Only accept key as `date` not {type(key)}"
+            )
+        return self.root.get(key)
 
     @property
     def _start_date(self) -> date:

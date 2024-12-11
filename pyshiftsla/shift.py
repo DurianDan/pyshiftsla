@@ -185,15 +185,15 @@ class Shift(BaseModel):
     def get_outer(
         self,
         other: "Shift",
-        resovled_overlap: RESOLVED_OVERLAPPED_SHIFT | None = None,
+        resolved_overlap: RESOLVED_OVERLAPPED_SHIFT | None = None,
     ) -> RESOLVED_OUTER_SHIFTS:
         """Get the outer `Shift`s of 2 overlapped `Shift`s,
         return both of them, if not overlapped
         """
-        if resovled_overlap is None:
-            resovled_overlap = self.get_overlap(other)
+        if resolved_overlap is None:
+            resolved_overlap = self.get_overlap(other)
         outer_shifts = [self]
-        match resovled_overlap["compare_result"]:
+        match resolved_overlap["compare_result"]:
             case "smaller" | "greater":
                 outer_shifts.append(other)
             case "end-connects-start" | "start-connects-end":
@@ -209,10 +209,10 @@ class Shift(BaseModel):
                 outer_shifts = [
                     Shift(
                         start=min([self.start, other.start]),
-                        end=resovled_overlap["overlapped"].start,
+                        end=resolved_overlap["overlapped"].start,
                     ),
                     Shift(
-                        start=resovled_overlap["overlapped"].end,
+                        start=resolved_overlap["overlapped"].end,
                         end=max([self.end, other.end]),
                     ),
                 ]
