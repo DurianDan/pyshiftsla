@@ -50,6 +50,9 @@ class DailyShift(RootModel):
             )
         return self.root[idx]
 
+    def get_shifts_num(self) -> int:
+        return len(self.root)
+
     @classmethod
     def sorted_shifts_start(cls, shifts: List[Shift]) -> SORTED_SHIFTS_START:
         sorted_shifts = sorted(shifts, key=lambda x: x.start)
