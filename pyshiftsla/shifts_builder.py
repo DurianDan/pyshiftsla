@@ -170,7 +170,7 @@ class ShiftsBuilder(BaseModel):
         :param `default_if_no_shifts_are_between`: is used no `Shift`s are found between `start_deal` and `end_deal`. If `"diff"`, method will calculate `Milliseconds` between `start_deal` and `end_deal`
         """
         start_deal_date, end_deal_date = start_deal.date(), end_deal.date()
-        if use_generated_shifts:
+        if not use_generated_shifts:
             self.build_shifts_from_daterange(start_deal_date, end_deal_date)
         return self._generated_shifts.work_amount_in_shiftrange(
             start_deal, end_deal, default_if_no_shifts_are_between

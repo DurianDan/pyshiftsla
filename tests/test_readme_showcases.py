@@ -118,6 +118,10 @@ def test_readme_second_showcase_us_woman_sla():
             }
         ),
     )
+    US_WOMAN_LIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.build_shifts_from_daterange(
+        from_date=date(2024, 1, 1),
+        to_date=date(2024, 12, 31),
+    )
     sla_millis = (
         US_WOMAN_LIVING_IN_VIETNAM_MATERNITY_LEAVE_4MONTHS_2024.calculate_sla(
             start_deal=datetime(2024, 1, 1, 14),

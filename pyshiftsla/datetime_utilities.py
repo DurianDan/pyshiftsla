@@ -20,7 +20,7 @@ def diff_time(start: time, end: time) -> Milliseconds:
 
 def diff_datetime(start: datetime, end: datetime) -> Milliseconds:
     diff_obj: timedelta = end - start
-    return diff_obj.seconds * 1000
+    return diff_obj.total_seconds() * 1000
 
 
 def check_start_end_event(start: datetime | time, end: datetime | time) -> None:
